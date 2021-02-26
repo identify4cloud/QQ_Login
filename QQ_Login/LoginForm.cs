@@ -65,7 +65,6 @@ namespace QQ_Login
 
         private void button1_Click(object sender, EventArgs e)
         {
-
 			LoginQQ(textBox1.Text, textBox2.Text, "https://qzone.qq.com/");
 
 		}
