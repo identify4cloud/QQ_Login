@@ -155,7 +155,7 @@ namespace AndroidQQLib.QQ580.AndroidQQ
             pk.SetBin(tlv16e);
             _hash Hash = new _hash();
             byte[] retByte =this.tlv_pk("01 44", Hash.QQTEA(pk.GetAll(), TGTKey));
-            Console.WriteLine("tlv114:" + Environment.NewLine + BitConverter.ToString(retByte).Replace("-", " "));
+            Console.WriteLine("tlv144:" + Environment.NewLine + BitConverter.ToString(retByte).Replace("-", " "));
             return retByte;
         }
         public byte[] tlv109(byte[] imei_)

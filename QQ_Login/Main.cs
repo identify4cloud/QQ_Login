@@ -30,11 +30,6 @@ namespace QQ_Login
         }
 
 
-        private void button3_Click(object sender, EventArgs e)
-        {
-            AndroidQQ frm = new AndroidQQ();
-            frm.Show();
-        }
         private void Main_Load(object sender, EventArgs e)
         {
             byte[] bytes = { 0, 0, 0, 25 };

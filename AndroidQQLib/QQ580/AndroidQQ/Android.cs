@@ -2,6 +2,7 @@
 using AndroidQQLib.QQ580.datatype;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -198,6 +199,8 @@ namespace AndroidQQLib.QQ580.AndroidQQ
             {
                 islogin = 1;
             }
+            Console.WriteLine("组要发送的包:" + Environment.NewLine + BitConverter.ToString(pk.GetAll()).Replace("-", " "));
+
             _hash Hash = new _hash();
             byte[] t = Hash.QQTEA(pk.GetAll(), qq.key);
             t =  Pack((t), islogin);
@@ -259,6 +262,7 @@ namespace AndroidQQLib.QQ580.AndroidQQ
             pk.SetInt((b.Length + 4).ToString());
             pk.SetBin(b);
             b = pk.GetAll();
+            Console.WriteLine("发包加密后数组:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             return b; 
         }
         public byte[] Pack_sendSsoMsg_simple(int iversion, int iRequestId, string sServantName, string sFuncName,string mapKey,byte[] wupBuffer)
@@ -354,15 +358,16 @@ namespace AndroidQQLib.QQ580.AndroidQQ
             pk.SetBin(this.tlv.tlv188());
             pk.SetBin(this.tlv.tlv191());
             wupbuffer = pk.GetAll();
-            
+
+            Console.WriteLine("组合包:" + Environment.NewLine + BitConverter.ToString(wupbuffer).Replace("-", " "));
 
             _hash Hash = new _hash();
               
             byte[] tb = Hash.QQTEA(wupbuffer, this.qq.shareKey);
-             
+            Console.WriteLine("加密组合包:" + Environment.NewLine + BitConverter.ToString(tb).Replace("-", " "));
             wupbuffer = this.Pack_Pc("0810", tb, this.qq.randKey, this.qq.pub_key);
 
-           
+            Debug.Print("发登录包:" + Environment.NewLine + BitConverter.ToString(wupbuffer).Replace("-", " "));
             byte[] t = this.Make_login_sendSsoMsg("wtlogin.login", wupbuffer,new byte[] { }, this.gb.imei, this.qq._ksid, this.gb.ver, 1);
 
             tt = "";
@@ -370,6 +375,7 @@ namespace AndroidQQLib.QQ580.AndroidQQ
             {
                tt+=(t[j] + ",");
             }
+
             return t;
 
         }
@@ -423,7 +429,8 @@ namespace AndroidQQLib.QQ580.AndroidQQ
             pk.SetShort((tmp.Length + 3).ToString());
             pk.SetBin(tmp);
             tmp = pk.GetAll();
-            return tmp; 
+            byte[] retByte = tmp;
+            return retByte;
         }
 
         public byte[] Pack_StatSvc_Register_online() //上线
@@ -542,15 +549,18 @@ namespace AndroidQQLib.QQ580.AndroidQQ
             int head_len = 0;
             byte[] body_bin = new byte[] { };
 
-            if(data.Length == 0)
+            if (data.Length == 0)
             {
                 return;
             }
             //一次性把包收完
             b = Un_pack(data);
+            Debug.Print("收到的包:" + "\r\n" + BitConverter.ToString(b).Replace("-", " "));
             //大于一定长度之和会分包发送，要自己处理下哦
+
             _hash Hash = new _hash();
             b = Hash.UNQQTEA(b,qq.key);
+            Console.WriteLine("解密后数组:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             l = b.Length;
             unPack.SetData(b);
             Console.WriteLine(b.Length);
@@ -602,7 +612,7 @@ namespace AndroidQQLib.QQ580.AndroidQQ
                 tlv_cmd = unPack.GetBin(2);
                 tlv_len = unPack.GetShort();
                 _bin Xbin = new _bin();
-                tlv_get((Xbin.Bin2Hex(tlv_cmd)), unPack.GetBin(tlv_len));
+                tlv_get(Xbin.Bin2Hex(tlv_cmd), unPack.GetBin(tlv_len));
             } 
         }
 
@@ -627,18 +637,22 @@ namespace AndroidQQLib.QQ580.AndroidQQ
             if (tlv_cmd == "010A")
             {
                 qq.Token004C = b;
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "Token004C:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             }
             else if (tlv_cmd == "0114")
             {
                 qq.Token0058 = tlv.tlv114_get0058(b);
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "Token0058:" + Environment.NewLine + BitConverter.ToString(qq.Token0058).Replace("-", " "));
             }
             else if (tlv_cmd == "010E")
             {
                 qq.mST1Key = b;
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "mST1Key:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             }
             else if (tlv_cmd == "0103")
             {
                 qq.stweb = AndroidOnly.AndroidOnly.tohex(b);
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "stweb:" + qq.stweb);
             }
             else if (tlv_cmd == "0138")
             {
@@ -666,22 +680,27 @@ namespace AndroidQQLib.QQ580.AndroidQQ
             else if (tlv_cmd == "0120")
             {
                 qq.skey = b;
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "skey:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             }
             else if (tlv_cmd == "0136")
             {
                 qq.vkey = b;
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "vkey:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             }
             else if (tlv_cmd == "0305")
             {
                 qq.sessionKey = b;
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "sessionKey:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             }
             else if (tlv_cmd == "0143")
             {
                 qq.Token002C = b;
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "Token002C:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             }
             else if (tlv_cmd == "0164")
             {
                 qq.sid = b;
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "sid:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             }
             else if (tlv_cmd == "0130")
             {
@@ -695,27 +714,40 @@ namespace AndroidQQLib.QQ580.AndroidQQ
             {
                 l = unPack.GetShort();
                 qq.VieryToken1 = unPack.GetBin(l);
-                l = unPack.GetShort();
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "VieryToken1:" + Environment.NewLine + BitConverter.ToString(qq.VieryToken1).Replace("-", " "));
+                l = unPack.GetShort();//88D
                 qq.Viery = unPack.GetBin(l);
-                Console.WriteLine(qq.Viery.Length.ToString(), qq.Viery);
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "Verify:" + Environment.NewLine + BitConverter.ToString(qq.Viery).Replace("-", " "));
             }
             else if (tlv_cmd == "0104")
             {
                 qq.VieryToken2 = b;
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "VieryToken2:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             }
             else if (tlv_cmd == "016C")
             {
                 qq.pskey = b;
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "pskey:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
+            }
+            else if (tlv_cmd == "0165")
+            {
+                var errType = Convert.ToInt32(BitConverter.ToInt32(b.Take(4).ToArray().Reverse().ToArray(), 0));
+                var len1 = b.Skip(4).Take(1).ToArray().Reverse().ToArray()[0];
+                var pic_reason = Encoding.UTF8.GetString(b.Skip(4 + 1).ToArray(), 0, Convert.ToInt32(len1));
+                var len2 = Convert.ToInt32(BitConverter.ToInt32(b.Skip(4 + 1 + len1).Take(4).ToArray().Reverse().ToArray(), 0));
+                var str = Encoding.UTF8.GetString(b.Skip(4 + 1 + 2).ToArray(), 0, len2);
+                Debug.Print("协议号:" + tlv_cmd + Environment.NewLine + "ErrorType:" + errType.ToString() + " pic_reason:" + pic_reason);
             }
             else
             {
-                Console.WriteLine("Unknown tlv_cmd" + tlv_cmd);
+                Console.WriteLine("Unknown tlv_cmd:" + "\r\n" + BitConverter.ToString(b).Replace("-", " "));
             }
         }
 
 
         public void Un_Pack_VieryImage(byte[] b)
         {
+            Console.WriteLine("要解包的图像数据:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             _unpack Unpack =new _unpack();
             int i = 0;
             Unpack.SetData(b);
@@ -725,6 +757,7 @@ namespace AndroidQQLib.QQ580.AndroidQQ
 
         public byte[] Un_Pack_Login_Pc(byte[] b)
         {
+            Debug.Print("wtlogin.loginb包体:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             _unpack unPack =new _unpack();
             int l = 0;
             int result = 0;
@@ -742,7 +775,8 @@ namespace AndroidQQLib.QQ580.AndroidQQ
             b = unPack.GetBin(l - 16 - 1);
             _hash Hash = new _hash();
             b = Hash.UNQQTEA(b, qq.shareKey);
-            if(result != 0)
+            Debug.Print("解密后包体:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
+            if (result != 0)
             {
                 if (result == 2)
                 {
@@ -762,6 +796,7 @@ namespace AndroidQQLib.QQ580.AndroidQQ
             string title = "";
             string message = "";
             int typ = 0;
+            Debug.Print("收到的错误提示包:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             _unpack unPack = new _unpack();
             unPack.SetData(b);
             unPack.GetShort();
@@ -802,7 +837,7 @@ namespace AndroidQQLib.QQ580.AndroidQQ
 
             _hash Hash = new _hash();
             b = Hash.UNQQTEA(b, qq.TGTKey);
-
+            Debug.Print("解密后协议内容:" + Environment.NewLine + BitConverter.ToString(b).Replace("-", " "));
             Un_Tlv(b);
 
             qq.key =  qq.sessionKey;
@@ -824,8 +859,10 @@ namespace AndroidQQLib.QQ580.AndroidQQ
             pk.SetBin(tlv.tlv104(qq.VieryToken2));
             pk.SetBin(tlv.tlv116());
             wupbuffer = pk.GetAll();
+            Debug.Print("图片组包:" + "\r\n" + BitConverter.ToString(wupbuffer).Replace("-", " "));
             _hash Hash = new _hash();
             wupbuffer = Pack_Pc("0810", Hash.QQTEA(wupbuffer,qq.shareKey),qq.randKey,qq.pub_key);
+            Debug.Print("要发的图形验证包:" + "\r\n" + BitConverter.ToString(wupbuffer).Replace("-", " "));
             byte[] t = Make_login_sendSsoMsg("wtlogin.login", wupbuffer,new byte[] { }, gb.imei,qq._ksid, gb.ver, 1);
             return t;
         }

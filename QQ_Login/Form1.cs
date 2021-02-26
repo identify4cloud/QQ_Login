@@ -167,6 +167,7 @@ namespace QQ_Login
                             if (htmlElement.OuterHtml.Contains("https://xui.ptlogin2.qq.com/cgi-bin/xlogin?appid="))
                             {
                                 var source =  Regex.Match(htmlElement.OuterHtml, "<iframe.+?src=[\"'](.+?)[\"'].*?>", RegexOptions.IgnoreCase).Groups[1].Value.Replace("target=self&amp;", "target=_new&amp;");
+                                Debug.Print(source);
                                 string _embeddedpage = @"<html> <body><iframe class='login_frame' type='text/html' width='" + (webBrowser2.Width - 20).ToString() + "' height='" + (webBrowser2.Height - 20).ToString() + "' src='" + source + "'></iframe></body><html>";
                                 try
                                 {
